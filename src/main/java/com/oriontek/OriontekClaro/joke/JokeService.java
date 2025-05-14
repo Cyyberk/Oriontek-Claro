@@ -83,7 +83,6 @@ public class JokeService implements DefaultJokeService {
     @Override
     @Transactional
     public Joke updateJoke(long jokeId, Joke updatedJoke) {
-        System.out.println(updatedJoke.getMessage());
         Joke joke = jokeRepository.findById(jokeId).orElseThrow(()-> new JokeNotFoundException(jokeId));
         joke.setMessage(updatedJoke.getMessage());
         return jokeRepository.save(joke);

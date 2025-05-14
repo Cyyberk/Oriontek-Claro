@@ -35,14 +35,14 @@ public class JokeResource {
     @Path("/create")
     public Response createJoke(Joke joke){
         Joke newJoke = jokeService.createJoke(joke);
-        return Response.ok(newJoke).build();      
+        return Response.status(201).entity(newJoke).build();      
     } 
 
     @DELETE
     @Path("/{id}/delete")
     public Response deleteJoke(@PathParam("id") long id){
-        Joke joke = jokeService.deleteJoke(id);
-        return Response.ok(joke).build();
+        jokeService.deleteJoke(id);
+        return Response.status(204).build();
     }
 
     @PATCH
