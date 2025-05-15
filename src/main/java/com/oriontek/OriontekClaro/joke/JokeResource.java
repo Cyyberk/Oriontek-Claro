@@ -1,7 +1,8 @@
 package com.oriontek.OriontekClaro.joke;
 
 import org.springframework.stereotype.Component;
-
+import com.oriontek.OriontekClaro.joke.dto.ExternalJokeDTO;
+import com.oriontek.OriontekClaro.joke.dto.TotalJokeInteractionsDTO;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
@@ -60,7 +61,7 @@ public class JokeResource {
             return Response.ok(jokeService.likeJoke(id)).build();
         else if(action.equals("remove")) 
             return Response.ok(jokeService.removeLikeJoke(id)).build();
-        return null;
+        return Response.status(404).build();
     }
 
     @GET
@@ -70,9 +71,31 @@ public class JokeResource {
             return Response.ok(jokeService.dislikeJoke(id)).build();
         else if(action.equals("remove")) 
             return Response.ok(jokeService.removeDislikeJoke(id)).build();
-        return null;
+        return Response.status(404).build();
     }
 
     
+    @POST
+    @Path("/generate")
+    public Response generateRandomJoke(){
+        // Utilizando la api externa para crear nuevas bromas random para nuestra app.
+        ExternalJokeDTO externalAPIJoke = jokeService.generateRandomJoke(); 
+        if(externalAPIJoke != null) 
+        {
+            Joke joke = new Joke();
+            joke.setMessage(externalAPIJoke.getValue());
+            jokeService.createJoke(joke);
+            return Response.status(201).entity(joke).build();
+        }
+        return Response.status(404).build();
+    }
+
+    @GET
+    @Path("/{id}/interactions")
+    public Response getTotalInteractions(@PathParam("id") long id){
+        int total = jokeService.getTotalInteractions(id);
+        TotalJokeInteractionsDTO result = new TotalJokeInteractionsDTO((long) id, (long) total);
+        return Response.ok().entity(result).build();
+    }
 
 }

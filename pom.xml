@@ -38,8 +38,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-jersey</artifactId>
 		</dependency>
-
-		
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
@@ -61,10 +59,63 @@
 			<scope>test</scope>
 		</dependency>
 
+
+	<!-- Jakarta XML Binding (JAXB) -->
+	<dependency>
+		<groupId>jakarta.xml.bind</groupId>
+		<artifactId>jakarta.xml.bind-api</artifactId>
+		<version>4.0.0</version>
+	</dependency>
+	<dependency>
+		<groupId>org.glassfish.jaxb</groupId>
+		<artifactId>jaxb-runtime</artifactId>
+		<version>4.0.3</version>
+	</dependency>
+
+	<!-- Jakarta XML Web Services (JAX-WS) -->
+	<dependency>
+		<groupId>jakarta.xml.ws</groupId>
+		<artifactId>jakarta.xml.ws-api</artifactId>
+		<version>4.0.0</version>
+	</dependency>
+
+	<dependency>
+		<groupId>com.sun.xml.ws</groupId>
+		<artifactId>jaxws-rt</artifactId>
+		<version>4.0.1</version>
+	</dependency>
+
+
 	</dependencies>
 
 	<build>
 		<plugins>
+
+			<!-- CFX plugin para generar clases desde links WSDL y usarlos en Java -->
+			<plugin>
+			<groupId>org.apache.cxf</groupId>
+			<artifactId>cxf-codegen-plugin</artifactId>
+			<version>4.0.3</version>    <!-- Latest 3.5.x for Java 17 -->
+			<executions>
+				<execution>
+				<id>generate-sources</id>
+				<phase>generate-sources</phase>
+				<goals>
+					<goal>wsdl2java</goal>
+				</goals>
+				<configuration>
+					<wsdlOptions>
+					<wsdlOption>
+						<!-- Link del servicio a utilizar para la prueba SOAP. Una calculadora -->
+						<wsdl>http://www.dneonline.com/calculator.asmx?WSDL</wsdl>
+					</wsdlOption>
+					</wsdlOptions>
+					<fork>false</fork>
+				</configuration>
+				</execution>
+			</executions>
+			</plugin>
+		
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
