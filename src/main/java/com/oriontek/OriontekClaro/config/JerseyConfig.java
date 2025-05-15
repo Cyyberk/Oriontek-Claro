@@ -1,4 +1,4 @@
-package com.oriontek.OriontekClaro.config.jersey;
+package com.oriontek.OriontekClaro.config;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.springframework.context.annotation.Configuration;

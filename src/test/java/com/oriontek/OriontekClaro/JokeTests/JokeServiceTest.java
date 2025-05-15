@@ -2,7 +2,9 @@ package com.oriontek.OriontekClaro.JokeTests;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -18,11 +20,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.oriontek.OriontekClaro.calculator.CalculatorClient;
 import com.oriontek.OriontekClaro.joke.Joke;
 import com.oriontek.OriontekClaro.joke.JokeRepository;
 import com.oriontek.OriontekClaro.joke.JokeService;
+import com.oriontek.OriontekClaro.joke.dto.ExternalJokeDTO;
 import com.oriontek.OriontekClaro.joke.exceptions.JokeMinCountLimitException;
 import com.oriontek.OriontekClaro.joke.exceptions.JokeNotFoundException;
+
+import jakarta.ws.rs.client.Client;
+import jakarta.ws.rs.client.Invocation;
+import jakarta.ws.rs.client.WebTarget;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
 
 @ExtendWith(MockitoExtension.class)
 public class JokeServiceTest {
@@ -30,11 +40,27 @@ public class JokeServiceTest {
     @Mock
     private JokeRepository jokeRepository;
 
+    // Dependencias para probar API externa
+    @Mock
+    private Client mockClient;
+    @Mock
+    private WebTarget mockTarget;
+    @Mock
+    Invocation.Builder mockBuilder;
+    @Mock
+    Response mockResponse;
+
+    // Dependencia para probar la API SOAP
+    @Mock
+    private CalculatorClient calculator;
+
+    // Introducimos las dependencias de prueba al servicio
     @InjectMocks
     private JokeService jokeService;
 
     Joke mockJoke = new Joke(null, "test message", 0L,0L, null, null);
     Instant testCreatedAt = Instant.now();
+
 
     @Test
     void mustCreateJoke(){
@@ -164,5 +190,35 @@ public class JokeServiceTest {
         assertEquals(expectedReturnUpdatedJoke.getCreatedAt(), testCreatedAt); // Verificando si no fue modificada la fecha de creacion de la broma original
         assertNotEquals(expectedReturnUpdatedJoke.getUpdatedAt(), originalJoke.getUpdatedAt()); // Verificando si se cambio la ultima fecha de modificacion
     }
+
+    @Test
+    void mustGenerateRandomJoke(){
+        
+        ExternalJokeDTO mockJoke = new ExternalJokeDTO("this is a fake joke");
+
+        when(mockClient.target(anyString())).thenReturn(mockTarget);
+        when(mockTarget.request(MediaType.APPLICATION_JSON)).thenReturn(mockBuilder);
+        when(mockBuilder.get()).thenReturn(mockResponse);
+        when(mockResponse.readEntity(ExternalJokeDTO.class)).thenReturn(mockJoke);
+
+        ExternalJokeDTO result = jokeService.generateRandomJoke();
+
+        assertNotNull(result.getValue(), "this is a fake joke");
+       // verify(mockResponse).getStatus();
+
+    }
+
+    @Test
+    void mustCountTotalInteractions(){
+        
+        Joke joke = new Joke(1L, "test", 3, 5, null, null);
+       
+        when(jokeRepository.findById(1L)).thenReturn(Optional.of(joke));
+        when(calculator.add(3, 5)).thenReturn(8);
+    
+        int result = jokeService.getTotalInteractions(1L);
+        assertEquals(8, result);
+    }
+
 
 }

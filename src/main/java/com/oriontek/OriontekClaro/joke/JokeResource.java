@@ -53,7 +53,6 @@ public class JokeResource {
         return Response.ok(joke).build();
     }
 
-
     @GET
     @Path("/{id}/like")
     public Response likeJoke(@PathParam("id") long id, @QueryParam("action") String action){
@@ -74,7 +73,6 @@ public class JokeResource {
         return Response.status(404).build();
     }
 
-    
     @POST
     @Path("/generate")
     public Response generateRandomJoke(){

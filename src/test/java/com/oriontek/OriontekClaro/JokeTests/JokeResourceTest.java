@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.oriontek.OriontekClaro.joke.Joke;
 import com.oriontek.OriontekClaro.joke.JokeResource;
 import com.oriontek.OriontekClaro.joke.JokeService;
+import com.oriontek.OriontekClaro.joke.dto.ExternalJokeDTO;
+import com.oriontek.OriontekClaro.joke.dto.TotalJokeInteractionsDTO;
 
 import jakarta.ws.rs.core.Response;
 
@@ -126,6 +128,7 @@ public class JokeResourceTest{
         assertNotEquals(mockJoke.getUpdatedAt(), ((Joke) responseRemoveLike.getEntity()).getUpdatedAt());
         
     }
+
   
     @Test
     void mustDislikeJoke(){
@@ -150,7 +153,55 @@ public class JokeResourceTest{
         assertNotEquals(mockJoke.getUpdatedAt(), ((Joke) responseRemoveDislike.getEntity()).getUpdatedAt());
         
     }
+
+    @Test
+    void mustErrorLikingAndDislikingJoke(){
+
+        Response responseLike = jokeResource.likeJoke(1L, "invalid action"); //fail if no valid action were gived;
+        Response responseDislike = jokeResource.dislikeJoke(1L, "invalid action"); //fail if no valid action were gived;
+       
+        assertEquals(404, responseLike.getStatus());
+        assertEquals(404, responseDislike.getStatus());
+    }
+  
    
+    @Test
+    void mustGenerateRandomJoke(){
+
+        ExternalJokeDTO expectedRandomJoke = new ExternalJokeDTO("random joke");
+        mockJoke.setMessage(expectedRandomJoke.getValue());
+
+        Joke createdJoke = new Joke(1L, "random joke", 0L,0L, testCreatedAt, testCreatedAt);
+
+        when(jokeService.generateRandomJoke()).thenReturn(expectedRandomJoke);
+        when(jokeService.createJoke(mockJoke)).thenReturn(createdJoke);
+        
+        Response response = jokeResource.generateRandomJoke();
+
+        assertEquals(201, response.getStatus());
+        assertEquals(createdJoke.getMessage(), expectedRandomJoke.getValue());
+        
+    }
+
+     @Test
+    void mustErrorGeneratingRandomJoke(){
+
+        when(jokeService.generateRandomJoke()).thenReturn(null);
+        Response response = jokeResource.generateRandomJoke();
+        assertEquals(404, response.getStatus());
+    }
+
+    @Test
+    void mustCountTotalInteractions(){
+        
+        TotalJokeInteractionsDTO total = new TotalJokeInteractionsDTO(1L, 10);
+
+        when(jokeService.getTotalInteractions(1L)).thenReturn(10); // Total de likes y dislikes
+
+        Response response = jokeResource.getTotalInteractions(1L);
+        assertEquals(200, response.getStatus());
+        assertEquals(total, response.getEntity());
+    }
 
 
 }
