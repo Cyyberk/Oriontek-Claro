@@ -42,8 +42,8 @@ public class JokeResource {
     @DELETE
     @Path("/{id}/delete")
     public Response deleteJoke(@PathParam("id") long id){
-        jokeService.deleteJoke(id);
-        return Response.status(204).build();
+        Joke joke = jokeService.deleteJoke(id);
+        return Response.ok(joke).build();
     }
 
     @PATCH

@@ -89,7 +89,7 @@ public class JokeResourceTest{
 
         Response response = jokeResource.deleteJoke(1L);
 
-        assertEquals(204, response.getStatus());
+        assertEquals(200, response.getStatus());
     }
 
     @Test
