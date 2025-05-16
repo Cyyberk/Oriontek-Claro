@@ -46,13 +46,15 @@ public class JokeResource {
         return Response.ok(joke).build();
     }
 
+    // Este endpoint nos permite editar el mensaje de una broma
     @PATCH
     @Path("/{id}/edit")
     public Response updateJoke(@PathParam("id") long id, Joke updatedJoke){
         Joke joke = jokeService.updateJoke(id, updatedJoke);
         return Response.ok(joke).build();
     }
-
+    
+    // Con este endpoint pasamos un query "action" en la url, que indicara si se desea añadir o remover un like de una broma
     @GET
     @Path("/{id}/like")
     public Response likeJoke(@PathParam("id") long id, @QueryParam("action") String action){
@@ -63,6 +65,7 @@ public class JokeResource {
         return Response.status(404).build();
     }
 
+    // Al igual que el anterior, pasamos un query "action" con las opciones add or remove, pero en este caso para dislikes.
     @GET
     @Path("/{id}/dislike")
     public Response dislikeJoke(@PathParam("id") long id, @QueryParam("action") String action){
@@ -78,6 +81,8 @@ public class JokeResource {
     public Response generateRandomJoke(){
         // Utilizando la api externa para crear nuevas bromas random para nuestra app.
         ExternalJokeDTO externalAPIJoke = jokeService.generateRandomJoke(); 
+        
+        // Inmediatamente que obtenemos un mensaje de la API para nuestra broma, la guardamos en la base de datos
         if(externalAPIJoke != null) 
         {
             Joke joke = new Joke();
@@ -88,6 +93,8 @@ public class JokeResource {
         return Response.status(404).build();
     }
 
+    /*  Este endpoint devolvera un json que muestra el total de likes y dislikes que tiene una broma dado su id. 
+        Utiliza el servicio SOAP de calculadora obtenido de la red para sumar*/
     @GET
     @Path("/{id}/interactions")
     public Response getTotalInteractions(@PathParam("id") long id){

@@ -2,6 +2,7 @@ package com.oriontek.OriontekClaro.joke;
 
 import java.util.*;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.oriontek.OriontekClaro.calculator.CalculatorClient;
@@ -21,7 +22,9 @@ public class JokeService implements DefaultJokeService {
     private final JokeRepository jokeRepository;
     private final Client client; 
     private final CalculatorClient calculator;
-    private static final String JOKE_API_URL = "https://api.chucknorris.io/jokes/random";
+
+    @Value("${joke_api_url}")
+    private String JOKE_API_URL;
 
     public JokeService(JokeRepository jokeRepository, Client client, CalculatorClient calculator){
         this.jokeRepository = jokeRepository;
@@ -45,8 +48,7 @@ public class JokeService implements DefaultJokeService {
         return jokeRepository.save(joke);
     }
 
-    // Funciones para trabajar los likes de una broma.
-
+    // Añadir Like
     @Override
     @Transactional
     public Joke likeJoke(long jokeId) {
@@ -55,6 +57,7 @@ public class JokeService implements DefaultJokeService {
         return jokeRepository.save(joke);
     }
 
+    // Remover Like
     @Override
     @Transactional
     public Joke removeLikeJoke(long jokeId) {  
@@ -65,8 +68,7 @@ public class JokeService implements DefaultJokeService {
         return jokeRepository.save(joke);
     }
     
-    // Funciones para trabajar los dislikes de una broma.
-
+    // Añadir Dislike
     @Override
     @Transactional
     public Joke dislikeJoke(long jokeId) {
@@ -75,6 +77,7 @@ public class JokeService implements DefaultJokeService {
         return jokeRepository.save(joke);
     }
 
+    // Remover Dislike
     @Override
     @Transactional
     public Joke removeDislikeJoke(long jokeId) {
